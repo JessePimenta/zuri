@@ -5,7 +5,6 @@ interface StickyNoteProps {
 }
 
 const CYCLE_DURATION = 16;
-const SEGMENT = CYCLE_DURATION / 4;
 
 export const StickyNote = ({ comments }: StickyNoteProps) => {
   const fallback = ['"Leave a comment..."'];
