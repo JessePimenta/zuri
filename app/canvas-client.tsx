@@ -6,22 +6,18 @@ import { Nav } from "./components/nav";
 import { DarkModeToggle } from "./components/dark-mode-toggle";
 import { CanvasElement as CanvasElementCmp } from "./components/canvas-element";
 import { StickyNote } from "./components/sticky-note";
-import { AdminNote } from "./components/admin-note";
 import { Lightbox } from "./components/lightbox";
 import { Scrap } from "./components/scrap";
 import { CommentForm } from "./components/comment-form";
-import { createClient } from "@/lib/supabase/client";
 
 interface CanvasClientProps {
   elements: CanvasElement[];
   comments: Comment[];
-  adminNote: string | null;
 }
 
 export const CanvasClient = ({
   elements,
   comments,
-  adminNote,
 }: CanvasClientProps) => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
@@ -52,16 +48,6 @@ export const CanvasClient = ({
           onVideoClick={() => setLightboxOpen(true)}
         />
       ))}
-
-      {adminNote && (
-        <Scrap
-          id="admin-note"
-          style={{ top: 120, left: 50, transform: "rotate(-3deg)", zIndex: 20 }}
-          isNote
-        >
-          <AdminNote>{adminNote}</AdminNote>
-        </Scrap>
-      )}
 
       <Scrap
         id="note-1"

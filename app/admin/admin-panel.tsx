@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { CanvasElement, SiteState } from "@/lib/db";
+import type { CanvasElement } from "@/lib/db";
 import { CanvasElement as CanvasElementCmp } from "../components/canvas-element";
 import { Nav } from "../components/nav";
 import { Scrap } from "../components/scrap";
@@ -13,9 +13,7 @@ import Link from "next/link";
 export const AdminPanel = () => {
   const router = useRouter();
   const [elements, setElements] = useState<CanvasElement[]>([]);
-  const [siteState, setSiteState] = useState<SiteState | null>(null);
   const [loading, setLoading] = useState(true);
-  const [adminNote, setAdminNote] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
 
   const fetchData = async () => {
@@ -26,8 +24,6 @@ export const AdminPanel = () => {
     }
     const data = await res.json();
     setElements(data.elements ?? []);
-    setSiteState(data.siteState ?? null);
-    setAdminNote(data.siteState?.admin_note ?? "");
     setLoading(false);
   };
 
@@ -53,15 +49,6 @@ export const AdminPanel = () => {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
-    });
-    fetchData();
-  };
-
-  const handleSaveAdminNote = async () => {
-    await fetch("/api/admin/site-state", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ admin_note: adminNote || null }),
     });
     fetchData();
   };
@@ -122,29 +109,6 @@ export const AdminPanel = () => {
           }}
         />
       )}
-
-      <div className="admin-card" style={{ maxWidth: 480 }}>
-        <div className="admin-form-group" style={{ marginBottom: 12 }}>
-          <label className="admin-label">
-            Admin note (shown on homepage)
-          </label>
-          <textarea
-            value={adminNote}
-            onChange={(e) => setAdminNote(e.target.value)}
-            rows={3}
-            className="admin-textarea"
-          />
-        </div>
-        <div className="admin-form-actions">
-          <button
-            type="button"
-            onClick={handleSaveAdminNote}
-            className="admin-btn admin-btn-primary"
-          >
-            Save note
-          </button>
-        </div>
-      </div>
 
       <div className="canvas-container admin-canvas-preview">
         <Nav />

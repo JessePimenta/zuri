@@ -27,12 +27,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const elements = await getAllElements(supabase);
-  const { data: siteState } = await supabase
-    .from("site_state")
-    .select("*")
-    .eq("id", 1)
-    .single();
-  return NextResponse.json({ elements, siteState });
+  return NextResponse.json({ elements });
 }
 
 export async function POST(req: Request) {
