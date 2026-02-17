@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export const CommentForm = () => {
+  const router = useRouter();
   const [body, setBody] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
@@ -21,6 +23,7 @@ export const CommentForm = () => {
     }
     setBody("");
     setStatus("success");
+    router.refresh();
     setTimeout(() => setStatus("idle"), 2000);
   };
 
