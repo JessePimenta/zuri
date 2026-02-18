@@ -312,13 +312,15 @@ body.dark-mode .dark-mode-toggle {
 }
 
 .admin-sidebar {
-  width: 360px;
+  width: 380px;
+  min-width: 320px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   background: #fafafa;
   border-right: 1px solid #e4e4e7;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .admin-sidebar .admin-header {
@@ -327,11 +329,24 @@ body.dark-mode .dark-mode-toggle {
   margin-bottom: 0;
   border-bottom: 1px solid #e4e4e7;
   background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.admin-sidebar .admin-header > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
 }
 
 .admin-sidebar .admin-card {
   margin: 20px;
   margin-bottom: 20px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .admin-preview {
@@ -379,6 +394,8 @@ body.dark-mode .dark-mode-toggle {
   text-transform: uppercase;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .admin-btn-primary {
