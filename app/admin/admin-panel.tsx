@@ -91,72 +91,80 @@ export const AdminPanel = () => {
 
   if (loading) {
     return (
-      <div className="admin-page" style={{ padding: 48, textAlign: "center", color: "#71717a" }}>
-        Loading...
+      <div className="admin-layout">
+        <aside className="admin-sidebar">
+          <div className="admin-header">
+            <h1 className="font-tag" style={{ fontSize: "1.5rem" }}>Admin Panel</h1>
+          </div>
+          <p style={{ padding: 24, color: "#71717a", fontSize: 14 }}>Loading...</p>
+        </aside>
+        <main className="admin-preview" />
       </div>
     );
   }
 
   return (
-    <div className="admin-page">
-      <div className="admin-header">
-        <h1 className="font-tag" style={{ fontSize: "1.5rem" }}>
-          Admin Panel
-        </h1>
-        <div style={{ display: "flex", gap: 8 }}>
-          <Link
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="admin-btn admin-btn-secondary"
-            style={{ textDecoration: "none" }}
-          >
-            View site
-          </Link>
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="admin-btn admin-btn-secondary"
-          >
-            Sign out
-          </button>
+    <div className="admin-layout">
+      <aside className="admin-sidebar">
+        <div className="admin-header">
+          <h1 className="font-tag" style={{ fontSize: "1.5rem" }}>
+            Admin Panel
+          </h1>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Link
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="admin-btn admin-btn-secondary"
+              style={{ textDecoration: "none" }}
+            >
+              View site
+            </Link>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="admin-btn admin-btn-secondary"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
-      </div>
-
-      <UploadAndAddForm onSuccess={() => void fetchData()} />
-
-      <div className="canvas-container admin-canvas-preview">
-        <Nav />
-        <Scrap
-          id="main-tag"
-          className="font-tag"
-          style={{
-            top: 40,
-            right: 50,
-            fontSize: "5rem",
-            opacity: 0.1,
-            pointerEvents: "none",
-          }}
-          draggable={false}
-        >
-          <span className="font-note" style={{ fontSize: "3.75rem" }}>ZURI</span>
-        </Scrap>
-        {elements.map((el) => (
-          <CanvasElementCmp
-            key={el.id}
-            element={el}
-            isAdmin
-            draftRotate={draftRotate[el.id]}
-            draftResize={draftResize[el.id]}
-            onTransformUpdate={handleTransformUpdate}
-            onRotatePreview={handleRotatePreview}
-            onRotateEnd={handleRotateEnd}
-            onResizePreview={handleResizePreview}
-            onResizeEnd={handleResizeEnd}
-            onDelete={handleDelete}
-          />
-        ))}
-      </div>
+        <UploadAndAddForm onSuccess={() => void fetchData()} />
+      </aside>
+      <main className="admin-preview">
+        <div className="canvas-container admin-canvas-preview">
+          <Nav />
+          <Scrap
+            id="main-tag"
+            className="font-tag"
+            style={{
+              top: 40,
+              right: 50,
+              fontSize: "5rem",
+              opacity: 0.1,
+              pointerEvents: "none",
+            }}
+            draggable={false}
+          >
+            <span className="font-note" style={{ fontSize: "3.75rem" }}>ZURI</span>
+          </Scrap>
+          {elements.map((el) => (
+            <CanvasElementCmp
+              key={el.id}
+              element={el}
+              isAdmin
+              draftRotate={draftRotate[el.id]}
+              draftResize={draftResize[el.id]}
+              onTransformUpdate={handleTransformUpdate}
+              onRotatePreview={handleRotatePreview}
+              onRotateEnd={handleRotateEnd}
+              onResizePreview={handleResizePreview}
+              onResizeEnd={handleResizeEnd}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
+      </main>
     </div>
   );
 };
