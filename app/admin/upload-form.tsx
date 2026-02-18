@@ -23,6 +23,7 @@ export const UploadAndAddForm = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [fileInputKey, setFileInputKey] = useState(0);
 
   const needsFile = type === "image" || type === "video";
 
@@ -97,6 +98,13 @@ export const UploadAndAddForm = ({
       return;
     }
 
+    setLoading(false);
+    setFile(null);
+    setContent("");
+    setCaption("");
+    setLabel("");
+    setFooterLabel("");
+    setFileInputKey((k) => k + 1);
     onSuccess();
   };
 
@@ -138,6 +146,7 @@ export const UploadAndAddForm = ({
           <div className="admin-form-group">
             <label className="admin-label">File</label>
             <input
+              key={fileInputKey}
               type="file"
               accept={type === "image" ? "image/*" : "video/*"}
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
