@@ -243,8 +243,9 @@ export const UploadAndAddForm = ({
             className="admin-preview-thumbnail"
             style={{
               flex: 1,
-              minWidth: 200,
-              minHeight: 180,
+              minWidth: 140,
+              minHeight: 105,
+              maxWidth: 200,
               aspectRatio: "4/3",
               background: "#f4f4f5",
               borderRadius: 4,
