@@ -14,7 +14,6 @@ export const AdminPanel = () => {
   const router = useRouter();
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAddForm, setShowAddForm] = useState(false);
 
   const fetchData = async () => {
     const res = await fetch("/api/admin/elements");
@@ -86,13 +85,6 @@ export const AdminPanel = () => {
           </Link>
           <button
             type="button"
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="admin-btn admin-btn-primary"
-          >
-            {showAddForm ? "Cancel" : "+ Add element"}
-          </button>
-          <button
-            type="button"
             onClick={handleSignOut}
             className="admin-btn admin-btn-secondary"
           >
@@ -101,14 +93,7 @@ export const AdminPanel = () => {
         </div>
       </div>
 
-      {showAddForm && (
-        <UploadAndAddForm
-          onSuccess={() => {
-            setShowAddForm(false);
-            void fetchData();
-          }}
-        />
-      )}
+      <UploadAndAddForm onSuccess={() => void fetchData()} />
 
       <div className="canvas-container admin-canvas-preview">
         <Nav />
