@@ -1,0 +1,14 @@
+---
+description: Require a git commit after every code change
+alwaysApply: true
+---
+
+# Git: Commit After Every Change
+
+You **MUST** make a git commit after every change. This is required.
+
+- After completing any edit or set of related edits that the user asked for, stage and commit with a clear message.
+- Use one commit per logical change (or one per request if multiple files). Do not leave the working tree with uncommitted changes when you finish a task.
+- Commit message: short summary line; optional body explaining what and why.
+
+Example flow: make the requested code change → `git add` the affected files → `git commit -m "Brief description"` → then respond to the user.
