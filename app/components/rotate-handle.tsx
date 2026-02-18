@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 interface RotateHandleProps {
   elementId: string;
   rotate: number;
-  onRotateChange: (degrees: number) => void;
+  onRotatePreview: (degrees: number) => void;
+  onRotateEnd: (degrees: number) => void;
 }
 
 const ROTATE_ICON = (
@@ -28,58 +29,58 @@ const ROTATE_ICON = (
 export const RotateHandle = ({
   elementId,
   rotate,
-  onRotateChange,
+  onRotatePreview,
+  onRotateEnd,
 }: RotateHandleProps) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const startRef = useRef({ rotate: 0, angle: 0 });
+  const dragRef = useRef<{
+    centerX: number;
+    centerY: number;
+    startRotate: number;
+    startAngle: number;
+  } | null>(null);
 
-  const getCenter = useCallback(() => {
+  const onMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     const el = document.getElementById(elementId);
-    if (!el) return null;
+    if (!el) return;
     const r = el.getBoundingClientRect();
-    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-  }, [elementId]);
-
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      const center = getCenter();
-      if (!center) return;
-      const angle = Math.atan2(
-        e.clientY - center.y,
-        e.clientX - center.x
-      );
-      startRef.current = { rotate, angle };
-      setIsDragging(true);
-    },
-    [getCenter, rotate]
-  );
-
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const center = getCenter();
-      if (!center) return;
-      const currentAngle = Math.atan2(
-        e.clientY - center.y,
-        e.clientX - center.x
-      );
-      const deltaDeg =
-        ((currentAngle - startRef.current.angle) * 180) / Math.PI;
-      const newRotate = startRef.current.rotate + deltaDeg;
-      onRotateChange(newRotate);
+    const centerX = r.left + r.width / 2;
+    const centerY = r.top + r.height / 2;
+    const startAngle = Math.atan2(
+      e.clientY - centerY,
+      e.clientX - centerX
+    );
+    dragRef.current = {
+      centerX,
+      centerY,
+      startRotate: rotate,
+      startAngle,
     };
 
-    const handleMouseUp = () => setIsDragging(false);
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+    const onMove = (moveEvent: MouseEvent) => {
+      if (!dragRef.current) return;
+      const { centerX: cx, centerY: cy, startRotate, startAngle } = dragRef.current;
+      const angle = Math.atan2(moveEvent.clientY - cy, moveEvent.clientX - cx);
+      const deltaDeg = ((angle - startAngle) * 180) / Math.PI;
+      onRotatePreview(startRotate + deltaDeg);
     };
-  }, [isDragging, getCenter, onRotateChange]);
+
+    const onUp = (upEvent: MouseEvent) => {
+      if (!dragRef.current) return;
+      const { centerX: cx, centerY: cy, startRotate, startAngle } = dragRef.current;
+      const angle = Math.atan2(upEvent.clientY - cy, upEvent.clientX - cx);
+      const deltaDeg = ((angle - startAngle) * 180) / Math.PI;
+      const finalRotate = startRotate + deltaDeg;
+      onRotateEnd(finalRotate);
+      dragRef.current = null;
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  };
 
   return (
     <div
@@ -87,7 +88,7 @@ export const RotateHandle = ({
       aria-label="Rotate"
       aria-valuenow={Math.round(rotate)}
       tabIndex={0}
-      onMouseDown={handleMouseDown}
+      onMouseDown={onMouseDown}
       style={{
         position: "absolute",
         right: -8,
@@ -101,7 +102,7 @@ export const RotateHandle = ({
         background: "#18181b",
         color: "#fff",
         borderRadius: 4,
-        cursor: isDragging ? "grabbing" : "grab",
+        cursor: "grab",
         boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
       }}
     >

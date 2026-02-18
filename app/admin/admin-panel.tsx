@@ -14,6 +14,7 @@ export const AdminPanel = () => {
   const router = useRouter();
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [draftRotate, setDraftRotate] = useState<Record<string, number>>({});
 
   const fetchData = async () => {
     const res = await fetch("/api/admin/elements");
@@ -40,6 +41,21 @@ export const AdminPanel = () => {
       body: JSON.stringify({ id, transform }),
     });
     fetchData();
+  };
+
+  const handleRotatePreview = (id: string, degrees: number) => {
+    setDraftRotate((prev) => ({ ...prev, [id]: degrees }));
+  };
+
+  const handleRotateEnd = async (id: string, degrees: number) => {
+    setDraftRotate((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    const el = elements.find((e) => e.id === id);
+    if (!el) return;
+    await handleTransformUpdate(id, { ...el.transform, rotate: degrees });
   };
 
   const handleDelete = async (id: string) => {
@@ -116,7 +132,10 @@ export const AdminPanel = () => {
             key={el.id}
             element={el}
             isAdmin
+            draftRotate={draftRotate[el.id]}
             onTransformUpdate={handleTransformUpdate}
+            onRotatePreview={handleRotatePreview}
+            onRotateEnd={handleRotateEnd}
             onDelete={handleDelete}
           />
         ))}

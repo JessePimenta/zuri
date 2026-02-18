@@ -9,18 +9,25 @@ import { RotateHandle } from "./rotate-handle";
 interface CanvasElementProps {
   element: CanvasElementType;
   isAdmin?: boolean;
-  onVideoClick?: () => void;
+  draftRotate?: number;
   onTransformUpdate?: (id: string, transform: Record<string, unknown>) => void;
+  onRotatePreview?: (id: string, degrees: number) => void;
+  onRotateEnd?: (id: string, degrees: number) => void;
+  onVideoClick?: () => void;
   onDelete?: (id: string) => void;
 }
 
-function transformToStyle(t: CanvasElementType["transform"]): React.CSSProperties {
+function transformToStyle(
+  t: CanvasElementType["transform"],
+  rotateOverride?: number
+): React.CSSProperties {
   const s: React.CSSProperties = {};
   if (t?.x != null) s.left = t.x;
   if (t?.y != null) s.top = t.y;
   if (t?.w != null) s.width = t.w;
   if (t?.h != null) s.height = t.h;
-  if (t?.rotate != null) s.transform = `rotate(${t.rotate}deg)`;
+  const rotate = rotateOverride ?? t?.rotate;
+  if (rotate != null) s.transform = `rotate(${rotate}deg)`;
   if (t?.z != null) s.zIndex = t.z;
   return s;
 }
@@ -28,12 +35,18 @@ function transformToStyle(t: CanvasElementType["transform"]): React.CSSPropertie
 export const CanvasElement = ({
   element,
   isAdmin = false,
+  draftRotate,
   onVideoClick,
   onTransformUpdate,
+  onRotatePreview,
+  onRotateEnd,
   onDelete,
 }: CanvasElementProps) => {
   const t = element.transform ?? {};
-  const style = { ...transformToStyle(t), ...(element.style as React.CSSProperties) };
+  const style = {
+    ...transformToStyle(t, draftRotate),
+    ...(element.style as React.CSSProperties),
+  };
   const caption = (element.style as { caption?: string })?.caption ?? "";
   const tape = (element.style as { tape?: boolean })?.tape ?? false;
   const tapeStyle = ((element.style as { tapeStyle?: string })?.tapeStyle ?? "default") as "default" | "gray";
@@ -44,13 +57,8 @@ export const CanvasElement = ({
       }
     : undefined;
 
-  const handleRotateChange = onTransformUpdate
-    ? (rotate: number) => {
-        onTransformUpdate(element.id, { ...t, rotate });
-      }
-    : undefined;
-
   const canDrag = !!onTransformUpdate;
+  const effectiveRotate = draftRotate ?? t?.rotate ?? 0;
 
   switch (element.type) {
     case "image":
@@ -66,8 +74,9 @@ export const CanvasElement = ({
               <ElementEditor elementId={element.id} onDelete={onDelete} />
               <RotateHandle
                 elementId={element.id}
-                rotate={t?.rotate ?? 0}
-                onRotateChange={handleRotateChange!}
+                rotate={effectiveRotate}
+                onRotatePreview={(deg) => onRotatePreview?.(element.id, deg)}
+                onRotateEnd={(deg) => onRotateEnd?.(element.id, deg)}
               />
             </>
           )}
@@ -88,8 +97,10 @@ export const CanvasElement = ({
           style={style}
           canDrag={canDrag}
           isAdmin={isAdmin}
+          draftRotate={draftRotate}
           onDragEnd={handleDragEnd}
-          onRotateChange={handleRotateChange}
+          onRotatePreview={onRotatePreview}
+          onRotateEnd={onRotateEnd}
           onDelete={onDelete}
           onVideoClick={onVideoClick}
         />
@@ -107,8 +118,9 @@ export const CanvasElement = ({
               <ElementEditor elementId={element.id} onDelete={onDelete} />
               <RotateHandle
                 elementId={element.id}
-                rotate={t?.rotate ?? 0}
-                onRotateChange={handleRotateChange!}
+                rotate={effectiveRotate}
+                onRotatePreview={(deg) => onRotatePreview?.(element.id, deg)}
+                onRotateEnd={(deg) => onRotateEnd?.(element.id, deg)}
               />
             </>
           )}
@@ -128,8 +140,9 @@ export const CanvasElement = ({
               <ElementEditor elementId={element.id} onDelete={onDelete} />
               <RotateHandle
                 elementId={element.id}
-                rotate={t?.rotate ?? 0}
-                onRotateChange={handleRotateChange!}
+                rotate={effectiveRotate}
+                onRotatePreview={(deg) => onRotatePreview?.(element.id, deg)}
+                onRotateEnd={(deg) => onRotateEnd?.(element.id, deg)}
               />
             </>
           )}
@@ -154,8 +167,10 @@ function VideoElement({
   style,
   canDrag,
   isAdmin,
+  draftRotate,
   onDragEnd,
-  onRotateChange,
+  onRotatePreview,
+  onRotateEnd,
   onDelete,
   onVideoClick,
 }: {
@@ -163,12 +178,15 @@ function VideoElement({
   style: React.CSSProperties;
   canDrag: boolean;
   isAdmin: boolean;
+  draftRotate?: number;
   onDragEnd?: (x: number, y: number) => void;
-  onRotateChange?: (degrees: number) => void;
+  onRotatePreview?: (id: string, degrees: number) => void;
+  onRotateEnd?: (id: string, degrees: number) => void;
   onDelete?: (id: string) => void;
   onVideoClick?: () => void;
 }) {
   const t = element.transform ?? {};
+  const effectiveRotate = draftRotate ?? t?.rotate ?? 0;
   const label = (element.style as { label?: string })?.label ?? "PLAY";
   const footerLabel = (element.style as { footerLabel?: string })?.footerLabel;
   return (
@@ -183,8 +201,9 @@ function VideoElement({
           <ElementEditor elementId={element.id} onDelete={onDelete} />
           <RotateHandle
             elementId={element.id}
-            rotate={t?.rotate ?? 0}
-            onRotateChange={onRotateChange!}
+            rotate={effectiveRotate}
+            onRotatePreview={(deg) => onRotatePreview?.(element.id, deg)}
+            onRotateEnd={(deg) => onRotateEnd?.(element.id, deg)}
           />
         </>
       )}
