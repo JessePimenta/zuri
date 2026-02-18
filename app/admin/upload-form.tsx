@@ -108,26 +108,31 @@ export const UploadAndAddForm = ({
       <div
         style={{
           display: "flex",
-          gap: 32,
+          gap: 0,
           alignItems: "flex-start",
+          justifyContent: "space-between",
         }}
       >
         <div style={{ flex: "0 0 320px" }}>
         <div className="admin-form-group">
-          <label className="admin-label">Type</label>
-          <select
-            value={type}
-            onChange={(e) => {
-              setType(e.target.value as ElementType);
-              setFile(null);
-            }}
-            className="admin-select"
-          >
-            <option value="image">Image</option>
-            <option value="video">Video</option>
-            <option value="text">Text</option>
-            <option value="link">Link</option>
-          </select>
+          <span className="admin-label" style={{ marginBottom: 8, display: "block" }}>Type</span>
+          <div className="admin-radio-row" role="radiogroup" aria-label="Element type">
+            {(["image", "video", "text", "link"] as const).map((value) => (
+              <label key={value} className="admin-radio-option">
+                <input
+                  type="radio"
+                  name="element-type"
+                  value={value}
+                  checked={type === value}
+                  onChange={() => {
+                    setType(value);
+                    setFile(null);
+                  }}
+                />
+                <span>{value.charAt(0).toUpperCase() + value.slice(1)}</span>
+              </label>
+            ))}
+          </div>
         </div>
         {needsFile && (
           <div className="admin-form-group">
@@ -244,8 +249,8 @@ export const UploadAndAddForm = ({
             style={{
               flex: 1,
               minWidth: 140,
-              minHeight: 105,
-              maxWidth: 200,
+              minHeight: 400,
+              maxWidth: 400,
               aspectRatio: "4/3",
               background: "#f4f4f5",
               borderRadius: 4,

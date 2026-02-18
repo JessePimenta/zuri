@@ -43,6 +43,12 @@ export const CanvasElement = ({
       }
     : undefined;
 
+  const handleRotateChange = onTransformUpdate
+    ? (rotate: number) => {
+        onTransformUpdate(element.id, { ...t, rotate });
+      }
+    : undefined;
+
   const canDrag = !!onTransformUpdate;
 
   switch (element.type) {
@@ -57,6 +63,8 @@ export const CanvasElement = ({
           {isAdmin && (
             <ElementEditor
               elementId={element.id}
+              rotate={t?.rotate ?? 0}
+              onRotateChange={handleRotateChange}
               onDelete={onDelete}
             />
           )}
@@ -78,6 +86,7 @@ export const CanvasElement = ({
           canDrag={canDrag}
           isAdmin={isAdmin}
           onDragEnd={handleDragEnd}
+          onRotateChange={handleRotateChange}
           onDelete={onDelete}
           onVideoClick={onVideoClick}
         />
@@ -93,6 +102,8 @@ export const CanvasElement = ({
           {isAdmin && (
             <ElementEditor
               elementId={element.id}
+              rotate={t?.rotate ?? 0}
+              onRotateChange={handleRotateChange}
               onDelete={onDelete}
             />
           )}
@@ -110,6 +121,8 @@ export const CanvasElement = ({
           {isAdmin && (
             <ElementEditor
               elementId={element.id}
+              rotate={t?.rotate ?? 0}
+              onRotateChange={handleRotateChange}
               onDelete={onDelete}
             />
           )}
@@ -135,6 +148,7 @@ function VideoElement({
   canDrag,
   isAdmin,
   onDragEnd,
+  onRotateChange,
   onDelete,
   onVideoClick,
 }: {
@@ -143,9 +157,11 @@ function VideoElement({
   canDrag: boolean;
   isAdmin: boolean;
   onDragEnd?: (x: number, y: number) => void;
+  onRotateChange?: (degrees: number) => void;
   onDelete?: (id: string) => void;
   onVideoClick?: () => void;
 }) {
+  const t = element.transform ?? {};
   const label = (element.style as { label?: string })?.label ?? "PLAY";
   const footerLabel = (element.style as { footerLabel?: string })?.footerLabel;
   return (
@@ -158,6 +174,8 @@ function VideoElement({
       {isAdmin && (
         <ElementEditor
           elementId={element.id}
+          rotate={t?.rotate ?? 0}
+          onRotateChange={onRotateChange}
           onDelete={onDelete}
         />
       )}

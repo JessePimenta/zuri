@@ -38,7 +38,7 @@ export const CanvasClient = ({
         }}
         draggable={false}
       >
-        ZURI
+        <span className="font-note">ZURI</span>
       </Scrap>
 
       {elements.map((el) => (

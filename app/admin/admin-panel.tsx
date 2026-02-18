@@ -109,7 +109,7 @@ export const AdminPanel = () => {
           }}
           draggable={false}
         >
-          ZURI
+          <span className="font-note" style={{ fontSize: "3.75rem" }}>ZURI</span>
         </Scrap>
         {elements.map((el) => (
           <CanvasElementCmp
