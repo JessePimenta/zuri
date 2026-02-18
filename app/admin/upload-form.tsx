@@ -121,7 +121,7 @@ export const UploadAndAddForm = ({
           justifyContent: "space-between",
         }}
       >
-        <div style={{ flex: "0 0 320px" }}>
+        <div style={{ flex: "1 1 0", minWidth: 0, maxWidth: "100%" }}>
         <div className="admin-form-group">
           <span className="admin-label" style={{ marginBottom: 8, display: "block" }}>Type</span>
           <div className="admin-radio-row" role="radiogroup" aria-label="Element type">
