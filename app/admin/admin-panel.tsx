@@ -15,6 +15,7 @@ export const AdminPanel = () => {
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [loading, setLoading] = useState(true);
   const [draftRotate, setDraftRotate] = useState<Record<string, number>>({});
+  const [draftResize, setDraftResize] = useState<Record<string, Record<string, unknown>>>({});
 
   const fetchData = async () => {
     const res = await fetch("/api/admin/elements");
@@ -56,6 +57,19 @@ export const AdminPanel = () => {
     const el = elements.find((e) => e.id === id);
     if (!el) return;
     await handleTransformUpdate(id, { ...el.transform, rotate: degrees });
+  };
+
+  const handleResizePreview = (id: string, partial: Record<string, unknown>) => {
+    setDraftResize((prev) => ({ ...prev, [id]: partial }));
+  };
+
+  const handleResizeEnd = async (id: string, partial: Record<string, unknown>) => {
+    setDraftResize((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    await handleTransformUpdate(id, partial);
   };
 
   const handleDelete = async (id: string) => {
@@ -133,9 +147,12 @@ export const AdminPanel = () => {
             element={el}
             isAdmin
             draftRotate={draftRotate[el.id]}
+            draftResize={draftResize[el.id]}
             onTransformUpdate={handleTransformUpdate}
             onRotatePreview={handleRotatePreview}
             onRotateEnd={handleRotateEnd}
+            onResizePreview={handleResizePreview}
+            onResizeEnd={handleResizeEnd}
             onDelete={handleDelete}
           />
         ))}

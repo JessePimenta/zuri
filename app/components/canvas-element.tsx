@@ -5,14 +5,18 @@ import { VideoModule } from "./video-module";
 import { Scrap } from "./scrap";
 import { ElementEditor } from "./element-editor";
 import { RotateHandle } from "./rotate-handle";
+import { ResizeHandle } from "./resize-handle";
 
 interface CanvasElementProps {
   element: CanvasElementType;
   isAdmin?: boolean;
   draftRotate?: number;
+  draftResize?: Record<string, unknown>;
   onTransformUpdate?: (id: string, transform: Record<string, unknown>) => void;
   onRotatePreview?: (id: string, degrees: number) => void;
   onRotateEnd?: (id: string, degrees: number) => void;
+  onResizePreview?: (id: string, partial: Record<string, unknown>) => void;
+  onResizeEnd?: (id: string, partial: Record<string, unknown>) => void;
   onVideoClick?: () => void;
   onDelete?: (id: string) => void;
 }
@@ -36,15 +40,19 @@ export const CanvasElement = ({
   element,
   isAdmin = false,
   draftRotate,
+  draftResize,
   onVideoClick,
   onTransformUpdate,
   onRotatePreview,
   onRotateEnd,
+  onResizePreview,
+  onResizeEnd,
   onDelete,
 }: CanvasElementProps) => {
   const t = element.transform ?? {};
+  const effectiveTransform = { ...t, ...draftResize } as CanvasElementType["transform"];
   const style = {
-    ...transformToStyle(t, draftRotate),
+    ...transformToStyle(effectiveTransform, draftRotate),
     ...(element.style as React.CSSProperties),
   };
   const caption = (element.style as { caption?: string })?.caption ?? "";
@@ -78,6 +86,12 @@ export const CanvasElement = ({
                 onRotatePreview={(deg) => onRotatePreview?.(element.id, deg)}
                 onRotateEnd={(deg) => onRotateEnd?.(element.id, deg)}
               />
+              <ResizeHandle
+                elementId={element.id}
+                transform={effectiveTransform}
+                onResizePreview={(partial) => onResizePreview?.(element.id, partial)}
+                onResizeEnd={(partial) => onResizeEnd?.(element.id, partial)}
+              />
             </>
           )}
           <PhotoPrint
@@ -98,9 +112,12 @@ export const CanvasElement = ({
           canDrag={canDrag}
           isAdmin={isAdmin}
           draftRotate={draftRotate}
+          draftResize={draftResize}
           onDragEnd={handleDragEnd}
           onRotatePreview={onRotatePreview}
           onRotateEnd={onRotateEnd}
+          onResizePreview={onResizePreview}
+          onResizeEnd={onResizeEnd}
           onDelete={onDelete}
           onVideoClick={onVideoClick}
         />
@@ -121,6 +138,12 @@ export const CanvasElement = ({
                 rotate={effectiveRotate}
                 onRotatePreview={(deg) => onRotatePreview?.(element.id, deg)}
                 onRotateEnd={(deg) => onRotateEnd?.(element.id, deg)}
+              />
+              <ResizeHandle
+                elementId={element.id}
+                transform={effectiveTransform}
+                onResizePreview={(partial) => onResizePreview?.(element.id, partial)}
+                onResizeEnd={(partial) => onResizeEnd?.(element.id, partial)}
               />
             </>
           )}
@@ -143,6 +166,12 @@ export const CanvasElement = ({
                 rotate={effectiveRotate}
                 onRotatePreview={(deg) => onRotatePreview?.(element.id, deg)}
                 onRotateEnd={(deg) => onRotateEnd?.(element.id, deg)}
+              />
+              <ResizeHandle
+                elementId={element.id}
+                transform={effectiveTransform}
+                onResizePreview={(partial) => onResizePreview?.(element.id, partial)}
+                onResizeEnd={(partial) => onResizeEnd?.(element.id, partial)}
               />
             </>
           )}
@@ -179,13 +208,17 @@ function VideoElement({
   canDrag: boolean;
   isAdmin: boolean;
   draftRotate?: number;
+  draftResize?: Record<string, unknown>;
   onDragEnd?: (x: number, y: number) => void;
   onRotatePreview?: (id: string, degrees: number) => void;
   onRotateEnd?: (id: string, degrees: number) => void;
+  onResizePreview?: (id: string, partial: Record<string, unknown>) => void;
+  onResizeEnd?: (id: string, partial: Record<string, unknown>) => void;
   onDelete?: (id: string) => void;
   onVideoClick?: () => void;
 }) {
   const t = element.transform ?? {};
+  const effectiveTransform = { ...t, ...draftResize } as CanvasElementType["transform"];
   const effectiveRotate = draftRotate ?? t?.rotate ?? 0;
   const label = (element.style as { label?: string })?.label ?? "PLAY";
   const footerLabel = (element.style as { footerLabel?: string })?.footerLabel;
@@ -204,6 +237,12 @@ function VideoElement({
             rotate={effectiveRotate}
             onRotatePreview={(deg) => onRotatePreview?.(element.id, deg)}
             onRotateEnd={(deg) => onRotateEnd?.(element.id, deg)}
+          />
+          <ResizeHandle
+            elementId={element.id}
+            transform={effectiveTransform}
+            onResizePreview={(partial) => onResizePreview?.(element.id, partial)}
+            onResizeEnd={(partial) => onResizeEnd?.(element.id, partial)}
           />
         </>
       )}
