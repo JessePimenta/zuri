@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { CanvasElement } from "@/lib/db";
-import { CanvasElement as CanvasElementCmp } from "../components/canvas-element";
-import { Nav } from "../components/nav";
-import { Scrap } from "../components/scrap";
+import { CanvasView } from "../components/canvas-view";
 import { UploadAndAddForm } from "./upload-form";
 import Link from "next/link";
 
@@ -14,6 +12,7 @@ export const AdminPanel = () => {
   const router = useRouter();
   const [elements, setElements] = useState<CanvasElement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [previewAsVisitor, setPreviewAsVisitor] = useState(false);
   const [draftRotate, setDraftRotate] = useState<Record<string, number>>({});
   const [draftResize, setDraftResize] = useState<Record<string, Record<string, unknown>>>({});
 
@@ -89,6 +88,10 @@ export const AdminPanel = () => {
     router.refresh();
   };
 
+  const displayElements = previewAsVisitor
+    ? elements.filter((el) => el.is_published)
+    : elements;
+
   if (loading) {
     return (
       <div className="admin-layout">
@@ -105,65 +108,86 @@ export const AdminPanel = () => {
 
   return (
     <div className="admin-layout">
-      <aside className="admin-sidebar">
-        <div className="admin-header">
-          <h1 className="font-tag" style={{ fontSize: "1.5rem" }}>
-            Admin Panel
-          </h1>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <Link
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="admin-btn admin-btn-secondary"
-              style={{ textDecoration: "none" }}
-            >
-              View site
-            </Link>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="admin-btn admin-btn-secondary"
-            >
-              Sign out
-            </button>
+      {!previewAsVisitor && (
+        <aside className="admin-sidebar">
+          <div className="admin-header">
+            <h1 className="font-tag" style={{ fontSize: "1.5rem" }}>
+              Admin Panel
+            </h1>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <Link
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="admin-btn admin-btn-secondary"
+                style={{ textDecoration: "none" }}
+              >
+                View site
+              </Link>
+              <button
+                type="button"
+                onClick={() => setPreviewAsVisitor(true)}
+                className="admin-btn admin-btn-secondary"
+              >
+                View as visitor
+              </button>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="admin-btn admin-btn-secondary"
+              >
+                Sign out
+              </button>
+            </div>
           </div>
-        </div>
-        <UploadAndAddForm onSuccess={() => void fetchData()} />
-      </aside>
-      <main className="admin-preview">
-        <div className="canvas-container admin-canvas-preview">
-          <Nav />
-          <Scrap
-            id="main-tag"
-            className="font-tag"
-            style={{
-              top: 40,
-              right: 50,
-              fontSize: "5rem",
-              opacity: 0.1,
-              pointerEvents: "none",
-            }}
-            draggable={false}
+          <UploadAndAddForm onSuccess={() => void fetchData()} />
+        </aside>
+      )}
+      {previewAsVisitor && (
+        <div
+          className="admin-preview-banner"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+            padding: "10px 20px",
+            background: "#18181b",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12,
+            fontFamily: "Inter",
+            fontSize: 14,
+          }}
+        >
+          <span>Previewing as visitor</span>
+          <button
+            type="button"
+            onClick={() => setPreviewAsVisitor(false)}
+            className="admin-btn admin-btn-primary"
+            style={{ padding: "6px 12px", fontSize: 12 }}
           >
-            <span className="font-note" style={{ fontSize: "3.75rem" }}>ZURI</span>
-          </Scrap>
-          {elements.map((el) => (
-            <CanvasElementCmp
-              key={el.id}
-              element={el}
-              isAdmin
-              draftRotate={draftRotate[el.id]}
-              draftResize={draftResize[el.id]}
-              onTransformUpdate={handleTransformUpdate}
-              onRotatePreview={handleRotatePreview}
-              onRotateEnd={handleRotateEnd}
-              onResizePreview={handleResizePreview}
-              onResizeEnd={handleResizeEnd}
-              onDelete={handleDelete}
-            />
-          ))}
+            Exit preview
+          </button>
         </div>
+      )}
+      <main className="admin-preview" style={{ paddingTop: previewAsVisitor ? 52 : 0 }}>
+        <CanvasView
+          elements={displayElements}
+          isAdmin={!previewAsVisitor}
+          draftRotate={draftRotate}
+          draftResize={draftResize}
+          onTransformUpdate={handleTransformUpdate}
+          onRotatePreview={handleRotatePreview}
+          onRotateEnd={handleRotateEnd}
+          onResizePreview={handleResizePreview}
+          onResizeEnd={handleResizeEnd}
+          onDelete={handleDelete}
+          containerClassName={!previewAsVisitor ? "admin-canvas-preview" : undefined}
+        />
       </main>
     </div>
   );

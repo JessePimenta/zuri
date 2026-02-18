@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isAllowedAdmin } from "@/lib/auth";
 import {
   getAllElements,
   insertElement,
@@ -7,15 +8,10 @@ import {
   deleteElement,
 } from "@/lib/db";
 
-const ADMIN_EMAIL =
-  process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "<MY_EMAIL_PLACEHOLDER>";
-
 async function requireAdmin() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user || user.email !== ADMIN_EMAIL) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email || !isAllowedAdmin(user.email)) {
     return { error: "Unauthorized", supabase: null };
   }
   return { error: null, supabase };
