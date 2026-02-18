@@ -51,8 +51,11 @@ export const CanvasElement = ({
 }: CanvasElementProps) => {
   const t = element.transform ?? {};
   const effectiveTransform = { ...t, ...draftResize } as CanvasElementType["transform"];
+  const hasExplicitSize =
+    effectiveTransform?.w != null && effectiveTransform?.h != null;
   const style = {
     ...transformToStyle(effectiveTransform, draftRotate),
+    ...(hasExplicitSize ? { overflow: "hidden" } : {}),
     ...(element.style as React.CSSProperties),
   };
   const caption = (element.style as { caption?: string })?.caption ?? "";
@@ -77,6 +80,25 @@ export const CanvasElement = ({
           onDragEnd={handleDragEnd}
           draggable={canDrag}
         >
+          {hasExplicitSize ? (
+            <div className="scrap-content-fill">
+              <PhotoPrint
+                src={element.content}
+                alt={caption}
+                caption={caption}
+                tape={tape}
+                tapeStyle={tapeStyle}
+              />
+            </div>
+          ) : (
+            <PhotoPrint
+              src={element.content}
+              alt={caption}
+              caption={caption}
+              tape={tape}
+              tapeStyle={tapeStyle}
+            />
+          )}
           {isAdmin && (
             <>
               <ElementEditor elementId={element.id} onDelete={onDelete} />
@@ -94,13 +116,6 @@ export const CanvasElement = ({
               />
             </>
           )}
-          <PhotoPrint
-            src={element.content}
-            alt={caption}
-            caption={caption}
-            tape={tape}
-            tapeStyle={tapeStyle}
-          />
         </Scrap>
       );
     case "video":
@@ -130,6 +145,13 @@ export const CanvasElement = ({
           onDragEnd={handleDragEnd}
           draggable={canDrag}
         >
+          {hasExplicitSize ? (
+            <div className="scrap-content-fill">
+              <AdminNote>{element.content}</AdminNote>
+            </div>
+          ) : (
+            <AdminNote>{element.content}</AdminNote>
+          )}
           {isAdmin && (
             <>
               <ElementEditor elementId={element.id} onDelete={onDelete} />
@@ -147,7 +169,6 @@ export const CanvasElement = ({
               />
             </>
           )}
-          <AdminNote>{element.content}</AdminNote>
         </Scrap>
       );
     case "link":
@@ -158,6 +179,29 @@ export const CanvasElement = ({
           onDragEnd={handleDragEnd}
           draggable={canDrag}
         >
+          {hasExplicitSize ? (
+            <div className="scrap-content-fill">
+              <a
+                href={element.content}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-note"
+                style={{ color: "inherit", textDecoration: "underline" }}
+              >
+                {caption || element.content}
+              </a>
+            </div>
+          ) : (
+            <a
+              href={element.content}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-note"
+              style={{ color: "inherit", textDecoration: "underline" }}
+            >
+              {caption || element.content}
+            </a>
+          )}
           {isAdmin && (
             <>
               <ElementEditor elementId={element.id} onDelete={onDelete} />
@@ -175,15 +219,6 @@ export const CanvasElement = ({
               />
             </>
           )}
-          <a
-            href={element.content}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-note"
-            style={{ color: "inherit", textDecoration: "underline" }}
-          >
-            {caption || element.content}
-          </a>
         </Scrap>
       );
     default:
@@ -197,9 +232,12 @@ function VideoElement({
   canDrag,
   isAdmin,
   draftRotate,
+  draftResize,
   onDragEnd,
   onRotatePreview,
   onRotateEnd,
+  onResizePreview,
+  onResizeEnd,
   onDelete,
   onVideoClick,
 }: {
@@ -219,9 +257,34 @@ function VideoElement({
 }) {
   const t = element.transform ?? {};
   const effectiveTransform = { ...t, ...draftResize } as CanvasElementType["transform"];
+  const hasExplicitSize = effectiveTransform?.w != null && effectiveTransform?.h != null;
   const effectiveRotate = draftRotate ?? t?.rotate ?? 0;
   const label = (element.style as { label?: string })?.label ?? "PLAY";
   const footerLabel = (element.style as { footerLabel?: string })?.footerLabel;
+  const videoContent = (
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+        onVideoClick?.();
+      }}
+      style={{ cursor: onVideoClick ? "pointer" : "default", height: "100%" }}
+    >
+      <VideoModule
+        playLabel={label}
+        footer={
+          footerLabel ? (
+            <div
+              className="font-ui"
+              style={{ padding: "0.8rem", fontSize: "0.6rem" }}
+            >
+              {footerLabel}
+            </div>
+          ) : undefined
+        }
+        onClick={undefined}
+      />
+    </div>
+  );
   return (
     <Scrap
       id={element.id}
@@ -229,6 +292,11 @@ function VideoElement({
       onDragEnd={onDragEnd}
       draggable={canDrag}
     >
+      {hasExplicitSize ? (
+        <div className="scrap-content-fill">{videoContent}</div>
+      ) : (
+        videoContent
+      )}
       {isAdmin && (
         <>
           <ElementEditor elementId={element.id} onDelete={onDelete} />
@@ -246,28 +314,6 @@ function VideoElement({
           />
         </>
       )}
-      <div
-        onClick={(e) => {
-          e.stopPropagation();
-          onVideoClick?.();
-        }}
-        style={{ cursor: onVideoClick ? "pointer" : "default" }}
-      >
-        <VideoModule
-          playLabel={label}
-          footer={
-            footerLabel ? (
-              <div
-                className="font-ui"
-                style={{ padding: "0.8rem", fontSize: "0.6rem" }}
-              >
-                {footerLabel}
-              </div>
-            ) : undefined
-        }
-        onClick={undefined}
-        />
-      </div>
     </Scrap>
   );
 }
