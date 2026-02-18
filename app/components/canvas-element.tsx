@@ -4,6 +4,7 @@ import { AdminNote } from "./admin-note";
 import { VideoModule } from "./video-module";
 import { Scrap } from "./scrap";
 import { ElementEditor } from "./element-editor";
+import { RotateHandle } from "./rotate-handle";
 
 interface CanvasElementProps {
   element: CanvasElementType;
@@ -61,12 +62,14 @@ export const CanvasElement = ({
           draggable={canDrag}
         >
           {isAdmin && (
-            <ElementEditor
-              elementId={element.id}
-              rotate={t?.rotate ?? 0}
-              onRotateChange={handleRotateChange}
-              onDelete={onDelete}
-            />
+            <>
+              <ElementEditor elementId={element.id} onDelete={onDelete} />
+              <RotateHandle
+                elementId={element.id}
+                rotate={t?.rotate ?? 0}
+                onRotateChange={handleRotateChange!}
+              />
+            </>
           )}
           <PhotoPrint
             src={element.content}
@@ -100,12 +103,14 @@ export const CanvasElement = ({
           draggable={canDrag}
         >
           {isAdmin && (
-            <ElementEditor
-              elementId={element.id}
-              rotate={t?.rotate ?? 0}
-              onRotateChange={handleRotateChange}
-              onDelete={onDelete}
-            />
+            <>
+              <ElementEditor elementId={element.id} onDelete={onDelete} />
+              <RotateHandle
+                elementId={element.id}
+                rotate={t?.rotate ?? 0}
+                onRotateChange={handleRotateChange!}
+              />
+            </>
           )}
           <AdminNote>{element.content}</AdminNote>
         </Scrap>
@@ -119,12 +124,14 @@ export const CanvasElement = ({
           draggable={canDrag}
         >
           {isAdmin && (
-            <ElementEditor
-              elementId={element.id}
-              rotate={t?.rotate ?? 0}
-              onRotateChange={handleRotateChange}
-              onDelete={onDelete}
-            />
+            <>
+              <ElementEditor elementId={element.id} onDelete={onDelete} />
+              <RotateHandle
+                elementId={element.id}
+                rotate={t?.rotate ?? 0}
+                onRotateChange={handleRotateChange!}
+              />
+            </>
           )}
           <a
             href={element.content}
@@ -172,12 +179,14 @@ function VideoElement({
       draggable={canDrag}
     >
       {isAdmin && (
-        <ElementEditor
-          elementId={element.id}
-          rotate={t?.rotate ?? 0}
-          onRotateChange={onRotateChange}
-          onDelete={onDelete}
-        />
+        <>
+          <ElementEditor elementId={element.id} onDelete={onDelete} />
+          <RotateHandle
+            elementId={element.id}
+            rotate={t?.rotate ?? 0}
+            onRotateChange={onRotateChange!}
+          />
+        </>
       )}
       <div
         onClick={(e) => {
