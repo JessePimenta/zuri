@@ -347,17 +347,6 @@ body.dark-mode .dark-mode-toggle {
   margin-bottom: 20px;
   min-width: 0;
   overflow: hidden;
-  box-sizing: border-box;
-}
-
-.admin-sidebar .admin-card .admin-input,
-.admin-sidebar .admin-card input[type="file"] {
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.admin-sidebar .admin-card input[type="file"] {
-  padding-right: 12px;
 }
 
 .admin-preview {
