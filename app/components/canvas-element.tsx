@@ -55,7 +55,6 @@ export const CanvasElement = ({
     effectiveTransform?.w != null && effectiveTransform?.h != null;
   const style = {
     ...transformToStyle(effectiveTransform, draftRotate),
-    ...(hasExplicitSize ? { overflow: "hidden" } : {}),
     ...(element.style as React.CSSProperties),
   };
   const caption = (element.style as { caption?: string })?.caption ?? "";
