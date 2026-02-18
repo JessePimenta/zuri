@@ -55,10 +55,11 @@ export const CanvasClient = ({
         style={{ bottom: "2rem", left: "2rem", transform: "rotate(-4deg)" }}
         isNote
       >
-        <StickyNote comments={comments} />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12 }}>
+          <StickyNote comments={comments} />
+          <CommentForm />
+        </div>
       </Scrap>
-
-      <CommentForm />
 
       <Lightbox isOpen={lightboxOpen} onClose={() => setLightboxOpen(false)} />
     </div>

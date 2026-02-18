@@ -31,10 +31,6 @@ export const CommentForm = () => {
     <form
       onSubmit={handleSubmit}
       style={{
-        position: "absolute",
-        bottom: "2rem",
-        right: "5rem",
-        zIndex: 100,
         display: "flex",
         gap: 8,
         alignItems: "center",
