@@ -43,7 +43,7 @@ export const CanvasElement = ({
       }
     : undefined;
 
-  const canDrag = !isAdmin || !!onTransformUpdate;
+  const canDrag = !!onTransformUpdate;
 
   switch (element.type) {
     case "image":
