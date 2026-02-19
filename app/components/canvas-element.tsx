@@ -201,6 +201,7 @@ function VideoElement({
         <div
           className="youtube-embed-wrap"
           style={{
+            position: "relative",
             width: 320,
             height: 180,
             minWidth: 280,
@@ -211,6 +212,21 @@ function VideoElement({
             background: "#000",
           }}
         >
+          {canDrag && (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 28,
+                zIndex: 5,
+                cursor: "grab",
+              }}
+              title="Drag to move"
+              aria-hidden
+            />
+          )}
           <iframe
             src={element.content}
             title="YouTube video"
