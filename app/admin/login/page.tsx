@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
@@ -10,7 +9,6 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,8 +21,9 @@ export default function AdminLoginPage() {
       setError(error.message);
       return;
     }
-    router.push("/admin");
-    router.refresh();
+    // Full page redirect so the next request includes the session cookies
+    // set by Supabase; router.push + refresh can run before cookies are sent.
+    window.location.href = "/admin";
   };
 
   return (
