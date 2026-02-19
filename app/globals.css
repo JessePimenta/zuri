@@ -598,6 +598,11 @@ body.dark-mode .dark-mode-toggle {
   margin-top: 8px;
 }
 
+.element-editor-trash:hover {
+  background: #dc2626 !important;
+  color: #fff !important;
+}
+
 .admin-canvas-preview {
   min-height: 100%;
 }
