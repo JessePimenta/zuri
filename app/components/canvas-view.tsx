@@ -15,13 +15,9 @@ export interface CanvasViewProps {
   isAdmin: boolean;
   /** Admin-only: draft rotate per element id */
   draftRotate?: Record<string, number>;
-  /** Admin-only: draft resize per element id */
-  draftResize?: Record<string, Record<string, unknown>>;
   onTransformUpdate?: (id: string, transform: Record<string, unknown>) => void;
   onRotatePreview?: (id: string, degrees: number) => void;
   onRotateEnd?: (id: string, degrees: number) => void;
-  onResizePreview?: (id: string, partial: Record<string, unknown>) => void;
-  onResizeEnd?: (id: string, partial: Record<string, unknown>) => void;
   onDelete?: (id: string) => void;
   /** Public-only: for lightbox */
   onVideoClick?: () => void;
@@ -35,12 +31,9 @@ export const CanvasView = ({
   elements,
   isAdmin,
   draftRotate,
-  draftResize,
   onTransformUpdate,
   onRotatePreview,
   onRotateEnd,
-  onResizePreview,
-  onResizeEnd,
   onDelete,
   onVideoClick,
   comments = [],
@@ -56,33 +49,15 @@ export const CanvasView = ({
       <Nav />
       {!isAdmin && <DarkModeToggle />}
 
-      <Scrap
-        id="main-tag"
-        className="font-tag"
-        style={{
-          top: 40,
-          right: 50,
-          fontSize: "5rem",
-          opacity: 0.1,
-          pointerEvents: "none",
-        }}
-        draggable={false}
-      >
-        <span className="font-note">ZURI</span>
-      </Scrap>
-
       {elements.map((el) => (
         <CanvasElementCmp
           key={el.id}
           element={el}
           isAdmin={isAdmin}
           draftRotate={isAdmin ? draftRotate?.[el.id] : undefined}
-          draftResize={isAdmin ? draftResize?.[el.id] : undefined}
           onTransformUpdate={onTransformUpdate}
           onRotatePreview={onRotatePreview}
           onRotateEnd={onRotateEnd}
-          onResizePreview={onResizePreview}
-          onResizeEnd={onResizeEnd}
           onDelete={onDelete}
           onVideoClick={effectiveVideoClick}
         />
