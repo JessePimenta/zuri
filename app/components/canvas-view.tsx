@@ -63,19 +63,18 @@ export const CanvasView = ({
         />
       ))}
 
-      {!isAdmin && (
-        <Scrap
-          id="note-1"
-          className="testimonial-bar"
-          style={{ bottom: "2rem", left: "2rem", transform: "rotate(-4deg)" }}
-          isNote
-        >
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12 }}>
-            <StickyNote comments={comments} />
-            <CommentForm />
-          </div>
-        </Scrap>
-      )}
+      <Scrap
+        id="note-1"
+        className="testimonial-bar"
+        style={{ bottom: "2rem", left: "2rem", transform: "rotate(-4deg)" }}
+        isNote
+        draggable
+      >
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 12 }}>
+          <StickyNote comments={comments} />
+          <CommentForm />
+        </div>
+      </Scrap>
 
       {!isAdmin && (
         <Lightbox isOpen={lightboxOpen} onClose={() => setLightboxOpen(false)} />
