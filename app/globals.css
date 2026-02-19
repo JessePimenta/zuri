@@ -379,12 +379,14 @@ body.dark-mode .dark-mode-toggle {
 .admin-preview {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   overflow: auto;
   background: #f7f6f2;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 0;
 }
 
 /* No border/outline/box around the canvas in admin preview */
@@ -396,10 +398,13 @@ body.dark-mode .dark-mode-toggle {
 }
 
 .admin-preview .canvas-container.admin-canvas-preview {
-  min-height: 600px;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
   border-radius: 0;
   background: #f7f6f2;
   box-shadow: rgba(0, 0, 0, 0.00) 0px 0px 0px 1px !important;
+  align-self: stretch;
 }
 
 .admin-page {
@@ -594,5 +599,5 @@ body.dark-mode .dark-mode-toggle {
 }
 
 .admin-canvas-preview {
-  min-height: 600px;
+  min-height: 100%;
 }
