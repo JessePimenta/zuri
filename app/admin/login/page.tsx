@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
 export default function AdminLoginPage() {
@@ -14,16 +13,22 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      setError(error.message);
-      return;
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+        credentials: "include",
+      });
+      if (res.redirected || res.status === 302 || res.status === 307) {
+        window.location.href = "/admin";
+        return;
+      }
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Login failed");
+    } finally {
+      setLoading(false);
     }
-    // Full page redirect so the next request includes the session cookies
-    // set by Supabase; router.push + refresh can run before cookies are sent.
-    window.location.href = "/admin";
   };
 
   return (
