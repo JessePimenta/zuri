@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/client";
 import type { CanvasElement } from "@/lib/db";
 import { CanvasView } from "../components/canvas-view";
 import { UploadAndAddForm } from "./upload-form";
-import Link from "next/link";
 
 export const AdminPanel = () => {
   const router = useRouter();
@@ -14,7 +13,6 @@ export const AdminPanel = () => {
   const [loading, setLoading] = useState(true);
   const [previewAsVisitor, setPreviewAsVisitor] = useState(false);
   const [draftRotate, setDraftRotate] = useState<Record<string, number>>({});
-  const [draftResize, setDraftResize] = useState<Record<string, Record<string, unknown>>>({});
 
   const fetchData = async () => {
     const res = await fetch("/api/admin/elements");
@@ -56,19 +54,6 @@ export const AdminPanel = () => {
     const el = elements.find((e) => e.id === id);
     if (!el) return;
     await handleTransformUpdate(id, { ...el.transform, rotate: degrees });
-  };
-
-  const handleResizePreview = (id: string, partial: Record<string, unknown>) => {
-    setDraftResize((prev) => ({ ...prev, [id]: partial }));
-  };
-
-  const handleResizeEnd = async (id: string, partial: Record<string, unknown>) => {
-    setDraftResize((prev) => {
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
-    await handleTransformUpdate(id, partial);
   };
 
   const handleDelete = async (id: string) => {
@@ -115,15 +100,6 @@ export const AdminPanel = () => {
               Admin Panel
             </h1>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <Link
-                href="/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="admin-btn admin-btn-secondary"
-                style={{ textDecoration: "none" }}
-              >
-                View site
-              </Link>
               <button
                 type="button"
                 onClick={() => setPreviewAsVisitor(true)}
@@ -179,12 +155,9 @@ export const AdminPanel = () => {
           elements={displayElements}
           isAdmin={!previewAsVisitor}
           draftRotate={draftRotate}
-          draftResize={draftResize}
           onTransformUpdate={handleTransformUpdate}
           onRotatePreview={handleRotatePreview}
           onRotateEnd={handleRotateEnd}
-          onResizePreview={handleResizePreview}
-          onResizeEnd={handleResizeEnd}
           onDelete={handleDelete}
           containerClassName={!previewAsVisitor ? "admin-canvas-preview" : undefined}
         />
