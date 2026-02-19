@@ -81,13 +81,15 @@ export const CanvasElement = ({
         >
           {hasExplicitSize ? (
             <div className="scrap-content-fill">
-              <PhotoPrint
-                src={element.content}
-                alt={caption}
-                caption={caption}
-                tape={tape}
-                tapeStyle={tapeStyle}
-              />
+              <div className="scrap-content-fill-inner">
+                <PhotoPrint
+                  src={element.content}
+                  alt={caption}
+                  caption={caption}
+                  tape={tape}
+                  tapeStyle={tapeStyle}
+                />
+              </div>
             </div>
           ) : (
             <PhotoPrint

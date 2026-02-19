@@ -113,15 +113,7 @@ export const UploadAndAddForm = ({
       <h3 className="admin-label" style={{ marginBottom: 20 }}>
         Add element
       </h3>
-      <div
-        style={{
-          display: "flex",
-          gap: 0,
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-        }}
-      >
-        <div style={{ flex: "0 0 320px" }}>
+      <div>
         <div className="admin-form-group">
           <span className="admin-label" style={{ marginBottom: 8, display: "block" }}>Type</span>
           <div className="admin-radio-row" role="radiogroup" aria-label="Element type">
@@ -143,16 +135,67 @@ export const UploadAndAddForm = ({
           </div>
         </div>
         {needsFile && (
-          <div className="admin-form-group">
-            <label className="admin-label">File</label>
-            <input
-              key={fileInputKey}
-              type="file"
-              accept={type === "image" ? "image/*" : "video/*"}
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="admin-input"
-            />
-          </div>
+          <>
+            <div className="admin-form-group">
+              <label className="admin-label">File</label>
+              <input
+                key={fileInputKey}
+                type="file"
+                accept={type === "image" ? "image/*" : "video/*"}
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                className="admin-input"
+              />
+            </div>
+            <div
+              className="admin-preview-thumbnail"
+              style={{
+                marginBottom: 16,
+                width: "100%",
+                maxWidth: 320,
+                aspectRatio: "4/3",
+                background: "#f4f4f5",
+                borderRadius: 4,
+                border: "1px solid #e4e4e7",
+                overflow: "hidden",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {previewUrl ? (
+                type === "image" ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                ) : (
+                  <video
+                    src={previewUrl}
+                    muted
+                    playsInline
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                )
+              ) : (
+                <span
+                  className="admin-label"
+                  style={{ color: "#a1a1aa", textTransform: "none" }}
+                >
+                  Select a file to preview
+                </span>
+              )}
+            </div>
+          </>
         )}
         {(type === "text" || type === "link") && (
           <div className="admin-form-group">
@@ -250,60 +293,6 @@ export const UploadAndAddForm = ({
             {loading ? (needsFile ? "Uploading..." : "Adding...") : "Add"}
           </button>
         </div>
-        </div>
-
-        {needsFile && (
-          <div
-            className="admin-preview-thumbnail"
-            style={{
-              flex: 1,
-              minWidth: 140,
-              minHeight: 400,
-              maxWidth: 400,
-              aspectRatio: "4/3",
-              background: "#f4f4f5",
-              borderRadius: 4,
-              border: "1px solid #e4e4e7",
-              overflow: "hidden",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {previewUrl ? (
-              type === "image" ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                  }}
-                />
-              ) : (
-                <video
-                  src={previewUrl}
-                  muted
-                  playsInline
-                  style={{
-                    maxWidth: "100%",
-                    maxHeight: "100%",
-                    objectFit: "contain",
-                  }}
-                />
-              )
-            ) : (
-              <span
-                className="admin-label"
-                style={{ color: "#a1a1aa", textTransform: "none" }}
-              >
-                Select a file to preview
-              </span>
-            )}
-          </div>
-        )}
       </div>
     </form>
   );
