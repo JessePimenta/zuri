@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import type { CanvasElement } from "@/lib/db";
 import { CanvasView } from "../components/canvas-view";
 import { UploadAndAddForm } from "./upload-form";
@@ -66,13 +65,6 @@ export const AdminPanel = () => {
     fetchData();
   };
 
-  const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/admin/login");
-    router.refresh();
-  };
-
   const displayElements = previewAsVisitor
     ? elements.filter((el) => el.is_published)
     : elements;
@@ -106,13 +98,6 @@ export const AdminPanel = () => {
                 className="admin-btn admin-btn-secondary"
               >
                 View as visitor
-              </button>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="admin-btn admin-btn-secondary"
-              >
-                Sign out
               </button>
             </div>
           </div>
