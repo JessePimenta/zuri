@@ -5,18 +5,14 @@ import { VideoModule } from "./video-module";
 import { Scrap } from "./scrap";
 import { ElementEditor } from "./element-editor";
 import { RotateHandle } from "./rotate-handle";
-import { ResizeHandle } from "./resize-handle";
 
 interface CanvasElementProps {
   element: CanvasElementType;
   isAdmin?: boolean;
   draftRotate?: number;
-  draftResize?: Record<string, unknown>;
   onTransformUpdate?: (id: string, transform: Record<string, unknown>) => void;
   onRotatePreview?: (id: string, degrees: number) => void;
   onRotateEnd?: (id: string, degrees: number) => void;
-  onResizePreview?: (id: string, partial: Record<string, unknown>) => void;
-  onResizeEnd?: (id: string, partial: Record<string, unknown>) => void;
   onVideoClick?: () => void;
   onDelete?: (id: string) => void;
 }
@@ -28,8 +24,7 @@ function transformToStyle(
   const s: React.CSSProperties = {};
   if (t?.x != null) s.left = t.x;
   if (t?.y != null) s.top = t.y;
-  if (t?.w != null) s.width = t.w;
-  if (t?.h != null) s.height = t.h;
+  /* width/height not applied – frame sizes to content; min/max width in CSS */
   const rotate = rotateOverride ?? t?.rotate;
   if (rotate != null) s.transform = `rotate(${rotate}deg)`;
   if (t?.z != null) s.zIndex = t.z;
@@ -40,21 +35,15 @@ export const CanvasElement = ({
   element,
   isAdmin = false,
   draftRotate,
-  draftResize,
   onVideoClick,
   onTransformUpdate,
   onRotatePreview,
   onRotateEnd,
-  onResizePreview,
-  onResizeEnd,
   onDelete,
 }: CanvasElementProps) => {
   const t = element.transform ?? {};
-  const effectiveTransform = { ...t, ...draftResize } as CanvasElementType["transform"];
-  const hasExplicitSize =
-    effectiveTransform?.w != null && effectiveTransform?.h != null;
   const style = {
-    ...transformToStyle(effectiveTransform, draftRotate),
+    ...transformToStyle(t, draftRotate),
     ...(element.style as React.CSSProperties),
   };
   const caption = (element.style as { caption?: string })?.caption ?? "";
@@ -79,27 +68,13 @@ export const CanvasElement = ({
           onDragEnd={handleDragEnd}
           draggable={canDrag}
         >
-          {hasExplicitSize ? (
-            <div className="scrap-content-fill">
-              <div className="scrap-content-fill-inner">
-                <PhotoPrint
-                  src={element.content}
-                  alt={caption}
-                  caption={caption}
-                  tape={tape}
-                  tapeStyle={tapeStyle}
-                />
-              </div>
-            </div>
-          ) : (
-            <PhotoPrint
-              src={element.content}
-              alt={caption}
-              caption={caption}
-              tape={tape}
-              tapeStyle={tapeStyle}
-            />
-          )}
+          <PhotoPrint
+            src={element.content}
+            alt={caption}
+            caption={caption}
+            tape={tape}
+            tapeStyle={tapeStyle}
+          />
           {isAdmin && (
             <>
               <ElementEditor elementId={element.id} onDelete={onDelete} />
@@ -108,12 +83,6 @@ export const CanvasElement = ({
                 rotate={effectiveRotate}
                 onRotatePreview={(deg) => onRotatePreview?.(element.id, deg)}
                 onRotateEnd={(deg) => onRotateEnd?.(element.id, deg)}
-              />
-              <ResizeHandle
-                elementId={element.id}
-                transform={effectiveTransform}
-                onResizePreview={(partial) => onResizePreview?.(element.id, partial)}
-                onResizeEnd={(partial) => onResizeEnd?.(element.id, partial)}
               />
             </>
           )}
@@ -128,12 +97,9 @@ export const CanvasElement = ({
           canDrag={canDrag}
           isAdmin={isAdmin}
           draftRotate={draftRotate}
-          draftResize={draftResize}
           onDragEnd={handleDragEnd}
           onRotatePreview={onRotatePreview}
           onRotateEnd={onRotateEnd}
-          onResizePreview={onResizePreview}
-          onResizeEnd={onResizeEnd}
           onDelete={onDelete}
           onVideoClick={onVideoClick}
         />
@@ -146,13 +112,7 @@ export const CanvasElement = ({
           onDragEnd={handleDragEnd}
           draggable={canDrag}
         >
-          {hasExplicitSize ? (
-            <div className="scrap-content-fill">
-              <AdminNote>{element.content}</AdminNote>
-            </div>
-          ) : (
-            <AdminNote>{element.content}</AdminNote>
-          )}
+          <AdminNote>{element.content}</AdminNote>
           {isAdmin && (
             <>
               <ElementEditor elementId={element.id} onDelete={onDelete} />
@@ -161,12 +121,6 @@ export const CanvasElement = ({
                 rotate={effectiveRotate}
                 onRotatePreview={(deg) => onRotatePreview?.(element.id, deg)}
                 onRotateEnd={(deg) => onRotateEnd?.(element.id, deg)}
-              />
-              <ResizeHandle
-                elementId={element.id}
-                transform={effectiveTransform}
-                onResizePreview={(partial) => onResizePreview?.(element.id, partial)}
-                onResizeEnd={(partial) => onResizeEnd?.(element.id, partial)}
               />
             </>
           )}
@@ -180,29 +134,15 @@ export const CanvasElement = ({
           onDragEnd={handleDragEnd}
           draggable={canDrag}
         >
-          {hasExplicitSize ? (
-            <div className="scrap-content-fill">
-              <a
-                href={element.content}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-note"
-                style={{ color: "inherit", textDecoration: "underline" }}
-              >
-                {caption || element.content}
-              </a>
-            </div>
-          ) : (
-            <a
-              href={element.content}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-note"
-              style={{ color: "inherit", textDecoration: "underline" }}
-            >
-              {caption || element.content}
-            </a>
-          )}
+          <a
+            href={element.content}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-note"
+            style={{ color: "inherit", textDecoration: "underline" }}
+          >
+            {caption || element.content}
+          </a>
           {isAdmin && (
             <>
               <ElementEditor elementId={element.id} onDelete={onDelete} />
@@ -211,12 +151,6 @@ export const CanvasElement = ({
                 rotate={effectiveRotate}
                 onRotatePreview={(deg) => onRotatePreview?.(element.id, deg)}
                 onRotateEnd={(deg) => onRotateEnd?.(element.id, deg)}
-              />
-              <ResizeHandle
-                elementId={element.id}
-                transform={effectiveTransform}
-                onResizePreview={(partial) => onResizePreview?.(element.id, partial)}
-                onResizeEnd={(partial) => onResizeEnd?.(element.id, partial)}
               />
             </>
           )}
@@ -233,12 +167,9 @@ function VideoElement({
   canDrag,
   isAdmin,
   draftRotate,
-  draftResize,
   onDragEnd,
   onRotatePreview,
   onRotateEnd,
-  onResizePreview,
-  onResizeEnd,
   onDelete,
   onVideoClick,
 }: {
@@ -247,45 +178,18 @@ function VideoElement({
   canDrag: boolean;
   isAdmin: boolean;
   draftRotate?: number;
-  draftResize?: Record<string, unknown>;
   onDragEnd?: (x: number, y: number) => void;
   onRotatePreview?: (id: string, degrees: number) => void;
   onRotateEnd?: (id: string, degrees: number) => void;
-  onResizePreview?: (id: string, partial: Record<string, unknown>) => void;
-  onResizeEnd?: (id: string, partial: Record<string, unknown>) => void;
   onDelete?: (id: string) => void;
   onVideoClick?: () => void;
 }) {
   const t = element.transform ?? {};
-  const effectiveTransform = { ...t, ...draftResize } as CanvasElementType["transform"];
-  const hasExplicitSize = effectiveTransform?.w != null && effectiveTransform?.h != null;
   const effectiveRotate = draftRotate ?? t?.rotate ?? 0;
   const label = (element.style as { label?: string })?.label ?? "PLAY";
   const footerLabel = (element.style as { footerLabel?: string })?.footerLabel;
-  const videoContent = (
-    <div
-      onClick={(e) => {
-        e.stopPropagation();
-        onVideoClick?.();
-      }}
-      style={{ cursor: onVideoClick ? "pointer" : "default", height: "100%" }}
-    >
-      <VideoModule
-        playLabel={label}
-        footer={
-          footerLabel ? (
-            <div
-              className="font-ui"
-              style={{ padding: "0.8rem", fontSize: "0.6rem" }}
-            >
-              {footerLabel}
-            </div>
-          ) : undefined
-        }
-        onClick={undefined}
-      />
-    </div>
-  );
+  const isYoutube = element.type === "youtube" && element.content?.includes("youtube.com/embed/");
+
   return (
     <Scrap
       id={element.id}
@@ -293,10 +197,55 @@ function VideoElement({
       onDragEnd={onDragEnd}
       draggable={canDrag}
     >
-      {hasExplicitSize ? (
-        <div className="scrap-content-fill">{videoContent}</div>
+      {isYoutube ? (
+        <div
+          className="youtube-embed-wrap"
+          style={{
+            width: 320,
+            height: 180,
+            minWidth: 280,
+            minHeight: 158,
+            maxWidth: "100%",
+            borderRadius: 4,
+            overflow: "hidden",
+            background: "#000",
+          }}
+        >
+          <iframe
+            src={element.content}
+            title="YouTube video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            style={{
+              width: "100%",
+              height: "100%",
+              border: "none",
+            }}
+          />
+        </div>
       ) : (
-        videoContent
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            onVideoClick?.();
+          }}
+          style={{ cursor: onVideoClick ? "pointer" : "default" }}
+        >
+          <VideoModule
+            playLabel={label}
+            footer={
+              footerLabel ? (
+                <div
+                  className="font-ui"
+                  style={{ padding: "0.8rem", fontSize: "0.6rem" }}
+                >
+                  {footerLabel}
+                </div>
+              ) : undefined
+            }
+            onClick={undefined}
+          />
+        </div>
       )}
       {isAdmin && (
         <>
@@ -306,12 +255,6 @@ function VideoElement({
             rotate={effectiveRotate}
             onRotatePreview={(deg) => onRotatePreview?.(element.id, deg)}
             onRotateEnd={(deg) => onRotateEnd?.(element.id, deg)}
-          />
-          <ResizeHandle
-            elementId={element.id}
-            transform={effectiveTransform}
-            onResizePreview={(partial) => onResizePreview?.(element.id, partial)}
-            onResizeEnd={(partial) => onResizeEnd?.(element.id, partial)}
           />
         </>
       )}

@@ -5,7 +5,30 @@ import { createClient } from "@/lib/supabase/client";
 
 const BUCKET = "media";
 
-type ElementType = "image" | "video" | "text" | "link";
+/** Returns YouTube embed URL if the input is a YouTube link, otherwise null. */
+function parseYouTubeEmbedUrl(url: string): string | null {
+  const u = url.trim();
+  if (!u) return null;
+  let videoId: string | null = null;
+  try {
+    if (u.includes("youtube.com/watch")) {
+      const match = u.match(/[?&]v=([^&]+)/);
+      videoId = match?.[1] ?? null;
+    } else if (u.includes("youtube.com/embed/")) {
+      const match = u.match(/youtube\.com\/embed\/([^/?&]+)/);
+      videoId = match?.[1] ?? null;
+    } else if (u.includes("youtu.be/")) {
+      const match = u.match(/youtu\.be\/([^/?&]+)/);
+      videoId = match?.[1] ?? null;
+    }
+    if (!videoId) return null;
+    return `https://www.youtube.com/embed/${videoId}`;
+  } catch {
+    return null;
+  }
+}
+
+type ElementType = "image" | "video" | "text" | "link" | "youtube";
 
 export const UploadAndAddForm = ({
   onSuccess,
@@ -50,7 +73,16 @@ export const UploadAndAddForm = ({
     setError("");
     setLoading(true);
 
-    let finalContent = content;
+    let finalContent = content.trim();
+    let effectiveType: string = type;
+
+    if (type === "link" && finalContent) {
+      const ytEmbed = parseYouTubeEmbedUrl(finalContent);
+      if (ytEmbed) {
+        effectiveType = "youtube";
+        finalContent = ytEmbed;
+      }
+    }
 
     if (needsFile && file) {
       const supabase = createClient();
@@ -75,7 +107,7 @@ export const UploadAndAddForm = ({
     } else if (type === "video") {
       if (label) style.label = label;
       if (footerLabel) style.footerLabel = footerLabel;
-    } else if (type === "link" && caption) {
+    } else if ((type === "link" || effectiveType === "youtube") && caption) {
       style.caption = caption;
     }
 
@@ -83,7 +115,7 @@ export const UploadAndAddForm = ({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        type,
+        type: effectiveType,
         content: finalContent,
         transform: { x: 100, y: 100, rotate: 0, z: 10 },
         style,
